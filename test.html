@@ -1,11 +1,291 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-	<meta charset="UTF-8">
-	<title>我的网页</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P.K. Liapounoff 定理：滚动式讲义</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a33;
+      --text: #e9eefc;
+      --muted: #a9b5d9;
+      --accent: #7fb3ff;
+      --accent-2: #9be7c4;
+      --line: #2b3762;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Times New Roman", "Noto Serif SC", "Source Han Serif SC", serif;
+      background: radial-gradient(circle at 20% 10%, #18264f 0%, var(--bg) 45%, #080c19 100%);
+      color: var(--text);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+    }
+
+    .slide {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: grid;
+      place-items: center;
+      padding: 4rem 8vw;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card {
+      width: min(1100px, 100%);
+      background: linear-gradient(160deg, rgba(18, 26, 51, 0.94), rgba(10, 16, 33, 0.96));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 2.2rem 2.6rem;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+      letter-spacing: 0.02em;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      margin-bottom: 1rem;
+      color: #f0f5ff;
+    }
+
+    h2 {
+      font-size: clamp(1.55rem, 2.8vw, 2.35rem);
+      color: #dce8ff;
+      margin-bottom: 1rem;
+    }
+
+    p,
+    li {
+      font-size: clamp(1.02rem, 1.45vw, 1.2rem);
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .math {
+      margin: 1rem 0;
+      padding: 0.85rem 1rem;
+      border-left: 4px solid var(--accent);
+      background: rgba(127, 179, 255, 0.1);
+      font-size: clamp(0.98rem, 1.35vw, 1.14rem);
+      line-height: 1.85;
+      overflow-x: auto;
+    }
+
+    .kicker {
+      display: inline-block;
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.8rem;
+      margin-bottom: 0.85rem;
+      border: 1px solid rgba(155, 231, 196, 0.4);
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    ul {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      padding-left: 1.35rem;
+    }
+
+    .nav {
+      position: fixed;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .nav a {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      display: block;
+    }
+
+    .nav a:hover {
+      background: var(--accent);
+    }
+
+    footer {
+      margin-top: 1.2rem;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    code {
+      font-family: "Fira Code", "JetBrains Mono", monospace;
+      color: #c7ddff;
+    }
+  </style>
 </head>
 <body>
-	<h1>你好</h1>
-	<p>本地打开<p>
+  <nav class="nav" aria-label="快速导航">
+    <a href="#s1" title="封面"></a>
+    <a href="#s2" title="定理"></a>
+    <a href="#s3" title="证明"></a>
+    <a href="#s4" title="推论"></a>
+    <a href="#s5" title="总结"></a>
+  </nav>
+
+  <section class="slide" id="s1">
+    <article class="card">
+      <span class="kicker">Probability Theory Seminar</span>
+      <h1>P.K. Liapounoff 定理（李雅普诺夫中心极限定理）</h1>
+      <p>
+        主题：独立但不一定同分布随机变量的归一化和，何时收敛到标准正态分布。
+      </p>
+      <div class="math">
+        关键词：<code>Characteristic Function</code>、<code>Lyapunov condition</code>、
+        <code>Central Limit Theorem</code>
+      </div>
+      <p class="muted">
+        滚动查看：定理叙述 → 证明思路（含关键估计）→ 衍生结论与课程化解读。
+      </p>
+      <footer>数学系本科高年级 / 研究生基础概率论风格讲义</footer>
+    </article>
+  </section>
+
+  <section class="slide" id="s2">
+    <article class="card">
+      <span class="kicker">Theorem Statement</span>
+      <h2>一、定理叙述（Lyapunov, 1901）</h2>
+      <p>
+        设随机变量列 <em>X₁, X₂, ..., Xₙ</em> 相互独立，记
+      </p>
+      <div class="math">
+        E[X_k]=\mu_k,\quad \mathrm{Var}(X_k)=\sigma_k^2,\quad B_n^2=\sum_{k=1}^n \sigma_k^2.
+      </div>
+      <p>若存在某个 \(\delta&gt;0\)，使得 Lyapunov 条件成立：</p>
+      <div class="math">
+        \lim_{n\to\infty}\frac{1}{B_n^{2+\delta}}\sum_{k=1}^n
+        E\big[|X_k-\mu_k|^{2+\delta}\big]=0,
+      </div>
+      <p>则归一化和</p>
+      <div class="math">
+        S_n^*=\frac{\sum_{k=1}^n (X_k-\mu_k)}{B_n}
+      </div>
+      <p>在分布上收敛到标准正态分布：</p>
+      <div class="math">
+        S_n^*\xRightarrow[]{d} N(0,1).
+      </div>
+    </article>
+  </section>
+
+  <section class="slide" id="s3">
+    <article class="card">
+      <span class="kicker">Proof Sketch</span>
+      <h2>二、证明（课程版，突出核心机制）</h2>
+      <ul>
+        <li>
+          <strong>中心化与缩放：</strong>记
+          \(Y_{k,n}=(X_k-\mu_k)/B_n\)，则 \(\sum_k \mathrm{Var}(Y_{k,n})=1\)。
+        </li>
+        <li>
+          <strong>特征函数展开：</strong>令 \(\phi_{k,n}(t)=E[e^{itY_{k,n}}]\)。
+          对小量 \(Y_{k,n}\) 作 Taylor 展开：
+          \(\phi_{k,n}(t)=1-\tfrac{t^2}{2}E[Y_{k,n}^2]+r_{k,n}(t)\)。
+        </li>
+        <li>
+          <strong>余项控制：</strong>存在常数 \(C_\delta\)，使
+        </li>
+      </ul>
+      <div class="math">
+        |r_{k,n}(t)|\le C_\delta |t|^{2+\delta}E\big[|Y_{k,n}|^{2+\delta}\big]
+        =C_\delta |t|^{2+\delta}\frac{E|X_k-\mu_k|^{2+\delta}}{B_n^{2+\delta}}.
+      </div>
+      <ul>
+        <li>
+          于是对全部 \(k\) 求和后，余项总量由 Lyapunov 条件推出趋于 0。
+        </li>
+        <li>
+          <strong>乘积极限：</strong>独立性给出
+          \(\phi_{S_n^*}(t)=\prod_{k=1}^n\phi_{k,n}(t)\)，取对数得
+        </li>
+      </ul>
+      <div class="math">
+        \log\phi_{S_n^*}(t)=-\frac{t^2}{2}\sum_{k=1}^n E[Y_{k,n}^2]+o(1)
+        =-\frac{t^2}{2}+o(1).
+      </div>
+      <p>
+        故 \(\phi_{S_n^*}(t)\to e^{-t^2/2}\)。由 Lévy 连续性定理，
+        \(S_n^*\Rightarrow N(0,1)\)。
+      </p>
+    </article>
+  </section>
+
+  <section class="slide" id="s4">
+    <article class="card">
+      <span class="kicker">Corollaries</span>
+      <h2>三、衍生结论与应用解释</h2>
+      <ul>
+        <li>
+          <strong>同分布情形回到经典 CLT：</strong>若 \(X_k\overset{i.i.d.}{\sim}(\mu,\sigma^2)\)
+          且 \(E|X_1-\mu|^{2+\delta}&lt;\infty\)，则
+          \((\sum_{k=1}^n X_k-n\mu)/(\sigma\sqrt n)\Rightarrow N(0,1)\)。
+        </li>
+        <li>
+          <strong>Lyapunov 条件 ⇒ Lindeberg 条件：</strong>因而该定理可视为
+          Lindeberg–Feller CLT 的一组“可检验”充分条件。
+        </li>
+        <li>
+          <strong>大样本统计的理论基础：</strong>样本均值、加权和、误差累积项在适当矩条件下近似正态，
+          支撑置信区间与显著性检验的渐近合理性。
+        </li>
+      </ul>
+      <div class="math">
+        \text{实践提示：}
+        \delta=1\text{（即三阶绝对矩有限）时，验证通常较容易，亦便于误差阶估计。}
+      </div>
+    </article>
+  </section>
+
+  <section class="slide" id="s5">
+    <article class="card">
+      <span class="kicker">Takeaway</span>
+      <h2>四、总结（数学系 PPT 风格）</h2>
+      <p>
+        P.K. Liapounoff 定理把“非同分布独立和”纳入中心极限定理框架：
+        只要高阶矩相对总方差衰减得足够快，整体分布便呈现高斯极限。
+      </p>
+      <ul>
+        <li>结构：<strong>条件（矩控制）→ 工具（特征函数）→ 结论（正态极限）</strong></li>
+        <li>意义：为现代统计推断中的“近似正态性”提供严格保证。</li>
+        <li>延伸阅读：Lindeberg–Feller CLT、Berry–Esseen 界、三角阵列极限定理。</li>
+      </ul>
+      <footer>
+        End of Slides · 可直接本地打开本 HTML，滚轮即“翻页”。
+      </footer>
+    </article>
+  </section>
 </body>
 </html>
